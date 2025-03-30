@@ -206,6 +206,7 @@
             // 
             // dgvMusteriler
             // 
+            dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvMusteriler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMusteriler.Location = new Point(43, 260);
             dgvMusteriler.Name = "dgvMusteriler";

@@ -244,15 +244,33 @@ namespace Car_Service_App
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                string query = string.IsNullOrEmpty(aramaTerimi) ?
-                    "SELECT * FROM Musteriler;" :
-                    "SELECT * FROM Musteriler WHERE Plaka LIKE @Arama OR Isim LIKE @Arama;";
+
+                string query = @"
+            SELECT 
+                m.ID, 
+                m.Plaka, 
+                m.Isim, 
+                GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
+            FROM Musteriler m
+            LEFT JOIN Islemler i ON m.ID = i.MusteriID
+            WHERE m.Plaka LIKE @Arama OR m.Isim LIKE @Arama
+            GROUP BY m.ID, m.Plaka, m.Isim;";
+
+                if (string.IsNullOrEmpty(aramaTerimi))
+                {
+                    query = @"
+                SELECT 
+                    m.ID, 
+                    m.Plaka, 
+                    m.Isim, 
+                    GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
+                FROM Musteriler m
+                LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                GROUP BY m.ID, m.Plaka, m.Isim;";
+                }
 
                 SQLiteCommand cmd = new SQLiteCommand(query, conn);
-                if (!string.IsNullOrEmpty(aramaTerimi))
-                {
-                    cmd.Parameters.AddWithValue("@Arama", "%" + aramaTerimi + "%");
-                }
+                cmd.Parameters.AddWithValue("@Arama", "%" + aramaTerimi + "%");
 
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd);
                 DataTable dt = new DataTable();
