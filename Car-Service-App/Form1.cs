@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Car_Service_App
@@ -8,6 +10,7 @@ namespace Car_Service_App
     public partial class Form1 : Form
     {
         string connectionString = "Data Source=database.db;Version=3;";
+        string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IslemKaydi.txt");
 
         private void CreateDatabase()
         {
@@ -15,18 +18,18 @@ namespace Car_Service_App
             {
                 conn.Open();
                 string queryMusteriler = @"CREATE TABLE IF NOT EXISTS Musteriler (
-                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    Plaka TEXT NOT NULL,
-                                    Isim TEXT NOT NULL
-                                  );";
+                                            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            Plaka TEXT NOT NULL,
+                                            Isim TEXT NOT NULL
+                                          );";
 
                 string queryIslemler = @"CREATE TABLE IF NOT EXISTS Islemler (
-                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    MusteriID INTEGER,
-                                    IslemAdi TEXT NOT NULL,
-                                    Durum TEXT NOT NULL,
-                                    FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
-                                  );";
+                                            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            MusteriID INTEGER,
+                                            IslemAdi TEXT NOT NULL,
+                                            Durum TEXT NOT NULL,
+                                            FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
+                                          );";
 
                 SQLiteCommand cmd1 = new SQLiteCommand(queryMusteriler, conn);
                 SQLiteCommand cmd2 = new SQLiteCommand(queryIslemler, conn);
@@ -34,7 +37,6 @@ namespace Car_Service_App
                 cmd2.ExecuteNonQuery();
             }
         }
-
 
         public Form1()
         {
@@ -70,19 +72,23 @@ namespace Car_Service_App
 
                 MessageBox.Show("Müþteri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
+                YazdirTxt();  // Update the text file after data update
             }
         }
 
         private void KaydetIslemler(SQLiteConnection conn, long musteriID)
         {
             List<(CheckBox, string)> islemler = new List<(CheckBox, string)>
-    {
-        (chkAdBlue, "AdBlue"),
-        (chkAnahtarKopyalama, "Anahtar Kopyalama"),
-        (chkYagDegisimi, "Yað Deðiþimi"),
-        (chkLastikDegisimi, "Lastik Deðiþimi"),
-        (chkArizaTespiti, "Arýza Tespiti")
-    };
+            {
+                (chkAdBlue, "AdBlue"),
+                (chkDPF, "DPF"),
+                (chkEGR, "EGR"),
+                (chkStage1, "Stage 1"),
+                (chkStage2, "Stage 2"),
+                (chkOnOff, "On/Off"),
+                (chkDtcOff, "DTC Off"),
+                (chkAnahtarKopyalama, "Anahtar Kopyalama")
+            };
 
             foreach (var (checkBox, islemAdi) in islemler)
             {
@@ -107,10 +113,39 @@ namespace Car_Service_App
                          FROM Musteriler m
                          LEFT JOIN Islemler i ON m.ID = i.MusteriID
                          GROUP BY m.ID, m.Plaka, m.Isim;";
+
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
                 dgvMusteriler.DataSource = dt;
+            }
+        }
+
+        private void YazdirTxt()
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                string query = @"SELECT m.Plaka, m.Isim, 
+                                GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
+                         FROM Musteriler m
+                         LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                         GROUP BY m.ID, m.Plaka, m.Isim;";
+
+                SQLiteCommand cmd = new SQLiteCommand(query, conn);
+                SQLiteDataReader reader = cmd.ExecuteReader();
+
+                List<string> lines = new List<string>();
+                while (reader.Read())
+                {
+                    string plaka = reader["Plaka"].ToString();
+                    string isim = reader["Isim"].ToString();
+                    string islemler = reader["Islemler"].ToString();
+                    lines.Add($"{plaka} - {isim}: {islemler}");
+                }
+
+                // Write to the file
+                File.WriteAllLines(filePath, lines);
             }
         }
 
@@ -139,6 +174,7 @@ namespace Car_Service_App
 
                 MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
+                YazdirTxt();  // Update the text file after deletion
             }
         }
 
@@ -151,7 +187,7 @@ namespace Car_Service_App
                 txtIsim.Text = dgvMusteriler.SelectedRows[0].Cells["Isim"].Value.ToString();
 
                 // CheckBox'larý sýfýrla
-                foreach (var checkbox in new CheckBox[] { chkAdBlue, chkAnahtarKopyalama, chkYagDegisimi, chkLastikDegisimi, chkArizaTespiti })
+                foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
                 {
                     checkbox.Checked = false;
                 }
@@ -171,10 +207,13 @@ namespace Car_Service_App
                         switch (islemAdi)
                         {
                             case "AdBlue": chkAdBlue.Checked = true; break;
+                            case "DPF": chkDPF.Checked = true; break;
+                            case "EGR": chkEGR.Checked = true; break;
+                            case "Stage 1": chkStage1.Checked = true; break;
+                            case "Stage 2": chkStage2.Checked = true; break;
+                            case "On/Off": chkOnOff.Checked = true; break;
+                            case "DTC Off": chkDtcOff.Checked = true; break;
                             case "Anahtar Kopyalama": chkAnahtarKopyalama.Checked = true; break;
-                            case "Yað Deðiþimi": chkYagDegisimi.Checked = true; break;
-                            case "Lastik Deðiþimi": chkLastikDegisimi.Checked = true; break;
-                            case "Arýza Tespiti": chkArizaTespiti.Checked = true; break;
                         }
                     }
                 }
@@ -221,10 +260,10 @@ namespace Car_Service_App
 
                 MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
+                YazdirTxt();  // Update the text file after update
             }
 
             Temizle();
-
         }
 
         private void Temizle()
@@ -232,7 +271,7 @@ namespace Car_Service_App
             txtPlaka.Text = "";
             txtIsim.Text = "";
 
-            foreach (var checkbox in new CheckBox[] { chkAdBlue, chkAnahtarKopyalama, chkYagDegisimi, chkLastikDegisimi, chkArizaTespiti })
+            foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
             {
                 checkbox.Checked = false;
             }
