@@ -1,6 +1,6 @@
 ﻿namespace Car_Service_App
 {
-    partial class Form1
+    partial class MainPage
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,10 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainPage));
             label1 = new Label();
             txtPlaka = new TextBox();
             groupBox1 = new GroupBox();
+            btnTuningliVeriKaydet = new Button();
+            btnOrijinalVeriKaydet = new Button();
             chkDtcOff = new CheckBox();
             chkOnOff = new CheckBox();
             chkStage2 = new CheckBox();
@@ -40,7 +42,6 @@
             chkDPF = new CheckBox();
             chkAnahtarKopyalama = new CheckBox();
             chkAdBlue = new CheckBox();
-            btnAra = new Button();
             txtAra = new TextBox();
             btnKaydet = new Button();
             btnSil = new Button();
@@ -49,13 +50,15 @@
             dgvMusteriler = new DataGridView();
             pictureBox1 = new PictureBox();
             groupBox2 = new GroupBox();
-            btnExit = new PictureBox();
             pictureBox2 = new PictureBox();
+            btnExit = new PictureBox();
+            lblTitle = new Label();
+            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMusteriler).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)btnExit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)btnExit).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -71,8 +74,24 @@
             // groupBox1
             // 
             resources.ApplyResources(groupBox1, "groupBox1");
+            groupBox1.Controls.Add(btnTuningliVeriKaydet);
+            groupBox1.Controls.Add(btnOrijinalVeriKaydet);
             groupBox1.Name = "groupBox1";
             groupBox1.TabStop = false;
+            // 
+            // btnTuningliVeriKaydet
+            // 
+            resources.ApplyResources(btnTuningliVeriKaydet, "btnTuningliVeriKaydet");
+            btnTuningliVeriKaydet.Name = "btnTuningliVeriKaydet";
+            btnTuningliVeriKaydet.UseVisualStyleBackColor = true;
+            btnTuningliVeriKaydet.Click += btnTuningliVeriKaydet_Click;
+            // 
+            // btnOrijinalVeriKaydet
+            // 
+            resources.ApplyResources(btnOrijinalVeriKaydet, "btnOrijinalVeriKaydet");
+            btnOrijinalVeriKaydet.Name = "btnOrijinalVeriKaydet";
+            btnOrijinalVeriKaydet.UseVisualStyleBackColor = true;
+            btnOrijinalVeriKaydet.Click += btnOrijinalVeriKaydet_Click;
             // 
             // chkDtcOff
             // 
@@ -122,17 +141,11 @@
             chkAdBlue.Name = "chkAdBlue";
             chkAdBlue.UseVisualStyleBackColor = true;
             // 
-            // btnAra
-            // 
-            resources.ApplyResources(btnAra, "btnAra");
-            btnAra.Name = "btnAra";
-            btnAra.UseVisualStyleBackColor = true;
-            btnAra.Click += btnAra_Click;
-            // 
             // txtAra
             // 
             resources.ApplyResources(txtAra, "txtAra");
             txtAra.Name = "txtAra";
+            txtAra.Click += txtAra_Click;
             txtAra.TextChanged += txtAra_TextChanged;
             // 
             // btnKaydet
@@ -198,6 +211,12 @@
             groupBox2.Name = "groupBox2";
             groupBox2.TabStop = false;
             // 
+            // pictureBox2
+            // 
+            resources.ApplyResources(pictureBox2, "pictureBox2");
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.TabStop = false;
+            // 
             // btnExit
             // 
             resources.ApplyResources(btnExit, "btnExit");
@@ -206,32 +225,32 @@
             btnExit.TabStop = false;
             btnExit.Click += btnExit_Click;
             // 
-            // pictureBox2
+            // lblTitle
             // 
-            resources.ApplyResources(pictureBox2, "pictureBox2");
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.TabStop = false;
+            resources.ApplyResources(lblTitle, "lblTitle");
+            lblTitle.Name = "lblTitle";
             // 
-            // Form1
+            // MainPage
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(lblTitle);
             Controls.Add(btnExit);
             Controls.Add(groupBox2);
             Controls.Add(pictureBox1);
             Controls.Add(dgvMusteriler);
-            Controls.Add(btnAra);
             Controls.Add(txtAra);
             Controls.Add(groupBox1);
             FormBorderStyle = FormBorderStyle.None;
             MaximizeBox = false;
-            Name = "Form1";
+            Name = "MainPage";
+            groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvMusteriler).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)btnExit).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)btnExit).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -251,7 +270,6 @@
         private Button btnGuncelle;
         private Button btnTemizle;
         private DataGridView dgvMusteriler;
-        private Button btnAra;
         private TextBox txtAra;
         private CheckBox chkDtcOff;
         private CheckBox chkOnOff;
@@ -260,5 +278,8 @@
         private GroupBox groupBox2;
         private PictureBox btnExit;
         private PictureBox pictureBox2;
+        private Label lblTitle;
+        private Button btnTuningliVeriKaydet;
+        private Button btnOrijinalVeriKaydet;
     }
 }

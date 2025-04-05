@@ -7,35 +7,40 @@ using System.Windows.Forms;
 
 namespace Car_Service_App
 {
-    public partial class Form1 : Form
+    public partial class MainPage : Form
     {
-        string connectionString = "Data Source=database.db;Version=3;";
-        string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IslemKaydi.txt");
+        string connectionString = "Data Source=CarServiceApp.db;Version=3;";
 
         private void CreateDatabase()
         {
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
+
                 string queryMusteriler = @"CREATE TABLE IF NOT EXISTS Musteriler (
-                                            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            Plaka TEXT NOT NULL
-                                          );";
+                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    Plaka TEXT NOT NULL,
+                                    CreateDate TEXT NOT NULL,
+                                    UpdateDate TEXT NOT NULL
+                                  );";
 
                 string queryIslemler = @"CREATE TABLE IF NOT EXISTS Islemler (
-                                            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            MusteriID INTEGER,
-                                            IslemAdi TEXT NOT NULL,
-                                            Durum TEXT NOT NULL,
-                                            FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
-                                          );";
+                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    MusteriID INTEGER,
+                                    IslemAdi TEXT NOT NULL,
+                                    Durum TEXT NOT NULL,
+                                    CreateDate TEXT NOT NULL,
+                                    UpdateDate TEXT NOT NULL,
+                                    FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
+                                  );";
 
                 new SQLiteCommand(queryMusteriler, conn).ExecuteNonQuery();
                 new SQLiteCommand(queryIslemler, conn).ExecuteNonQuery();
             }
         }
 
-        public Form1()
+
+        public MainPage()
         {
             CreateDatabase();
             InitializeComponent();
@@ -56,9 +61,13 @@ namespace Car_Service_App
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                string insertMusteri = "INSERT INTO Musteriler (Plaka) VALUES (@Plaka);";
+
+                // Güncellenmiþ insert sorgusu
+                string insertMusteri = "INSERT INTO Musteriler (Plaka, CreateDate, UpdateDate) VALUES (@Plaka, @CreateDate, @UpdateDate);";
                 SQLiteCommand cmd = new SQLiteCommand(insertMusteri, conn);
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
+                cmd.Parameters.AddWithValue("@CreateDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@UpdateDate", DateTime.Now);
                 cmd.ExecuteNonQuery();
 
                 long musteriID = conn.LastInsertRowId;
@@ -85,14 +94,19 @@ namespace Car_Service_App
                 (chkAnahtarKopyalama, "Anahtar Kopyalama")
             };
 
+            string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+
             foreach (var (checkBox, islemAdi) in islemler)
             {
                 if (checkBox.Checked)
                 {
-                    string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum) VALUES (@MusteriID, @IslemAdi, 'Yapýldý');";
+                    string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum, CreateDate, UpdateDate) VALUES (@MusteriID, @IslemAdi, 'Yapýldý', @CreateDate, @UpdateDate);";
                     SQLiteCommand cmd = new SQLiteCommand(insertIslem, conn);
                     cmd.Parameters.AddWithValue("@MusteriID", musteriID);
                     cmd.Parameters.AddWithValue("@IslemAdi", islemAdi);
+                    cmd.Parameters.AddWithValue("@CreateDate", currentDate);
+                    cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -104,23 +118,42 @@ namespace Car_Service_App
             {
                 conn.Open();
                 string query = @"
-                    SELECT 
-                        m.ID, 
-                        m.Plaka, 
-                        GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
-                    FROM Musteriler m
-                    LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                    GROUP BY m.ID, m.Plaka;";
+                SELECT 
+                    m.ID, 
+                    m.Plaka, 
+                    m.CreateDate AS 'Kayýt Tarihi',  -- Add CreateDate here
+                    m.UpdateDate AS 'Son Güncelleme Tarihi',  -- Add UpdateDate here
+                    GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
+                FROM Musteriler m
+                LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                GROUP BY m.ID, m.Plaka
+                ORDER BY m.ID DESC;";
 
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
                 dgvMusteriler.DataSource = dt;
+
+                dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+                // You can adjust the format of the date columns if needed
+                dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+                dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
             }
         }
 
+
         private void YazdirTxt()
         {
+            string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
+
+            if (!Directory.Exists(carServiceAppFolderPath))
+            {
+                Directory.CreateDirectory(carServiceAppFolderPath);
+            }
+
+            string filePath = Path.Combine(carServiceAppFolderPath, "IslemKaydi.txt");
+
             using (StreamWriter writer = new StreamWriter(filePath, false))
             {
                 foreach (DataGridViewRow row in dgvMusteriler.Rows)
@@ -134,6 +167,7 @@ namespace Car_Service_App
                 }
             }
         }
+
 
         private void btnSil_Click(object sender, EventArgs e)
         {
@@ -226,11 +260,15 @@ namespace Car_Service_App
             {
                 conn.Open();
 
+                string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+
                 // Müþteri bilgilerini güncelle
-                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka WHERE ID = @ID;";
+                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka, UpdateDate = @UpdateDate WHERE ID = @ID;";
                 SQLiteCommand cmd = new SQLiteCommand(updateMusteri, conn);
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
+                cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
                 cmd.Parameters.AddWithValue("@ID", musteriID);
+                cmd.Parameters.AddWithValue("@UpdateDate", DateTime.Now);
                 cmd.ExecuteNonQuery();
 
                 // Eski iþlemleri sil
@@ -260,7 +298,7 @@ namespace Car_Service_App
             }
         }
 
-        private void btnAra_Click(object sender, EventArgs e)
+        private void txtAra_TextChanged(object sender, EventArgs e)
         {
             string aramaTerimi = txtAra.Text.Trim();
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
@@ -268,25 +306,31 @@ namespace Car_Service_App
                 conn.Open();
 
                 string query = @"
-            SELECT 
-                m.ID, 
-                m.Plaka, 
-                GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
-            FROM Musteriler m
-            LEFT JOIN Islemler i ON m.ID = i.MusteriID
-            WHERE m.Plaka LIKE @Arama
-            GROUP BY m.ID, m.Plaka;";
+                SELECT 
+                    m.ID, 
+                    m.Plaka, 
+                    m.CreateDate AS 'Kayýt Tarihi',  -- Add CreateDate here
+                    m.UpdateDate AS 'Son Güncelleme Tarihi',  -- Add UpdateDate here
+                    GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
+                FROM Musteriler m
+                LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                WHERE m.Plaka LIKE @Arama
+                GROUP BY m.ID, m.Plaka
+                ORDER BY m.ID DESC;";
 
                 if (string.IsNullOrEmpty(aramaTerimi))
                 {
                     query = @"
-                SELECT 
-                    m.ID, 
-                    m.Plaka, 
-                    GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
-                FROM Musteriler m
-                LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                GROUP BY m.ID, m.Plaka;";
+                    SELECT 
+                        m.ID, 
+                        m.Plaka, 
+                        m.CreateDate AS 'Kayýt Tarihi', 
+                        m.UpdateDate AS 'Son Güncelleme Tarihi', 
+                        GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
+                    FROM Musteriler m
+                    LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                    GROUP BY m.ID, m.Plaka
+                    ORDER BY m.ID DESC;";
                 }
 
                 SQLiteCommand cmd = new SQLiteCommand(query, conn);
@@ -296,17 +340,83 @@ namespace Car_Service_App
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
                 dgvMusteriler.DataSource = dt;
-            }
-        }
+                dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
-        private void txtAra_TextChanged(object sender, EventArgs e)
-        {
-            btnAra_Click(sender, e); // Ayný arama metodunu çaðýrýyoruz
+                // Format date columns
+                dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+                dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btnOrijinalVeriKaydet_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                // Kullanýcýya herhangi bir dosya türü seçmesi için seçenek sunalým
+                saveFileDialog.Filter = "All files (*.*)|*.*";
+                saveFileDialog.Title = "Orijinal Veri Kaydet";
+
+                // Dosya seçildiðinde
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
+
+                    // Klasör yoksa oluþtur
+                    string originalFolderPath = Path.Combine(carServiceAppFolderPath, "Orijinal Veriler");
+                    if (!Directory.Exists(originalFolderPath))
+                    {
+                        Directory.CreateDirectory(originalFolderPath);
+                    }
+
+                    // Seçilen dosyanýn hedef yolu
+                    string targetFilePath = Path.Combine(originalFolderPath, Path.GetFileName(saveFileDialog.FileName));
+
+                    // Seçilen dosyayý hedef klasöre kopyala
+                    File.Copy(saveFileDialog.FileName, targetFilePath, true);
+
+                    MessageBox.Show("Orijinal veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void btnTuningliVeriKaydet_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "All files (*.*)|*.*";
+                saveFileDialog.Title = "Tuningli Veri Kaydet";
+
+                // Dosya seçildiðinde
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
+
+                    // Klasör yoksa oluþtur
+                    string tuningFolderPath = Path.Combine(carServiceAppFolderPath, "Tuningli Veriler");
+                    if (!Directory.Exists(tuningFolderPath))
+                    {
+                        Directory.CreateDirectory(tuningFolderPath);
+                    }
+
+                    // Seçilen dosyanýn hedef yolu
+                    string targetFilePath = Path.Combine(tuningFolderPath, Path.GetFileName(saveFileDialog.FileName));
+
+                    // Seçilen dosyayý hedef klasöre kopyala
+                    File.Copy(saveFileDialog.FileName, targetFilePath, true);
+
+                    MessageBox.Show("Tuningli veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void txtAra_Click(object sender, EventArgs e)
+        {
+            txtAra.Clear();
         }
     }
 }
