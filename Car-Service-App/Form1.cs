@@ -50,7 +50,7 @@ namespace Car_Service_App
 
         private void btnKaydet_Click(object sender, EventArgs e)
         {
-            string plaka = txtPlaka.Text.Trim();
+            string plaka = txtPlaka.Text.Trim().ToUpper();
 
             if (string.IsNullOrWhiteSpace(plaka))
             {

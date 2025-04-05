@@ -69,6 +69,7 @@
             // txtPlaka
             // 
             resources.ApplyResources(txtPlaka, "txtPlaka");
+            txtPlaka.BackColor = Color.AntiqueWhite;
             txtPlaka.Name = "txtPlaka";
             // 
             // groupBox1
@@ -82,15 +83,17 @@
             // btnTuningliVeriKaydet
             // 
             resources.ApplyResources(btnTuningliVeriKaydet, "btnTuningliVeriKaydet");
+            btnTuningliVeriKaydet.BackColor = Color.IndianRed;
             btnTuningliVeriKaydet.Name = "btnTuningliVeriKaydet";
-            btnTuningliVeriKaydet.UseVisualStyleBackColor = true;
+            btnTuningliVeriKaydet.UseVisualStyleBackColor = false;
             btnTuningliVeriKaydet.Click += btnTuningliVeriKaydet_Click;
             // 
             // btnOrijinalVeriKaydet
             // 
             resources.ApplyResources(btnOrijinalVeriKaydet, "btnOrijinalVeriKaydet");
+            btnOrijinalVeriKaydet.BackColor = Color.IndianRed;
             btnOrijinalVeriKaydet.Name = "btnOrijinalVeriKaydet";
-            btnOrijinalVeriKaydet.UseVisualStyleBackColor = true;
+            btnOrijinalVeriKaydet.UseVisualStyleBackColor = false;
             btnOrijinalVeriKaydet.Click += btnOrijinalVeriKaydet_Click;
             // 
             // chkDtcOff
@@ -144,6 +147,7 @@
             // txtAra
             // 
             resources.ApplyResources(txtAra, "txtAra");
+            txtAra.BackColor = Color.AntiqueWhite;
             txtAra.Name = "txtAra";
             txtAra.Click += txtAra_Click;
             txtAra.TextChanged += txtAra_TextChanged;
@@ -151,29 +155,33 @@
             // btnKaydet
             // 
             resources.ApplyResources(btnKaydet, "btnKaydet");
+            btnKaydet.BackColor = Color.Orange;
             btnKaydet.Name = "btnKaydet";
-            btnKaydet.UseVisualStyleBackColor = true;
+            btnKaydet.UseVisualStyleBackColor = false;
             btnKaydet.Click += btnKaydet_Click;
             // 
             // btnSil
             // 
             resources.ApplyResources(btnSil, "btnSil");
+            btnSil.BackColor = Color.Orange;
             btnSil.Name = "btnSil";
-            btnSil.UseVisualStyleBackColor = true;
+            btnSil.UseVisualStyleBackColor = false;
             btnSil.Click += btnSil_Click;
             // 
             // btnGuncelle
             // 
             resources.ApplyResources(btnGuncelle, "btnGuncelle");
+            btnGuncelle.BackColor = Color.Orange;
             btnGuncelle.Name = "btnGuncelle";
-            btnGuncelle.UseVisualStyleBackColor = true;
+            btnGuncelle.UseVisualStyleBackColor = false;
             btnGuncelle.Click += btnGuncelle_Click;
             // 
             // btnTemizle
             // 
             resources.ApplyResources(btnTemizle, "btnTemizle");
+            btnTemizle.BackColor = Color.Orange;
             btnTemizle.Name = "btnTemizle";
-            btnTemizle.UseVisualStyleBackColor = true;
+            btnTemizle.UseVisualStyleBackColor = false;
             // 
             // dgvMusteriler
             // 

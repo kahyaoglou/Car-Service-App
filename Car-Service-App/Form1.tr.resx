@@ -118,27 +118,36 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="label1.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
+  </data>
   <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 26</value>
+    <value>6, 27</value>
   </data>
   <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>38, 15</value>
+    <value>50, 21</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
     <value>Plaka:</value>
   </data>
+  <data name="txtPlaka.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
+  </data>
   <data name="txtPlaka.Location" type="System.Drawing.Point, System.Drawing">
-    <value>47, 23</value>
+    <value>62, 22</value>
   </data>
   <data name="txtPlaka.Size" type="System.Drawing.Size, System.Drawing">
-    <value>240, 23</value>
+    <value>225, 29</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="btnTuningliVeriKaydet.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
+  <data name="btnTuningliVeriKaydet.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 63</value>
+  </data>
   <data name="btnTuningliVeriKaydet.Size" type="System.Drawing.Size, System.Drawing">
-    <value>300, 23</value>
+    <value>300, 35</value>
   </data>
   <data name="btnTuningliVeriKaydet.Text" xml:space="preserve">
     <value>Tuningli Verileri Kaydet</value>
@@ -147,76 +156,154 @@
     <value>NoControl</value>
   </data>
   <data name="btnOrijinalVeriKaydet.Size" type="System.Drawing.Size, System.Drawing">
-    <value>300, 23</value>
+    <value>300, 35</value>
   </data>
   <data name="btnOrijinalVeriKaydet.Text" xml:space="preserve">
     <value>Orijinal Verileri Kaydet</value>
+  </data>
+  <data name="groupBox1.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
   </data>
   <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
     <value>377, 48</value>
   </data>
   <data name="groupBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>312, 81</value>
+    <value>312, 106</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>Dosya Ekle</value>
   </data>
+  <data name="chkDtcOff.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
+  </data>
   <data name="chkDtcOff.Location" type="System.Drawing.Point, System.Drawing">
-    <value>168, 137</value>
+    <value>182, 160</value>
+  </data>
+  <data name="chkDtcOff.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 25</value>
+  </data>
+  <data name="chkOnOff.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkOnOff.Location" type="System.Drawing.Point, System.Drawing">
-    <value>168, 112</value>
+    <value>182, 129</value>
+  </data>
+  <data name="chkOnOff.Size" type="System.Drawing.Size, System.Drawing">
+    <value>86, 25</value>
+  </data>
+  <data name="chkStage2.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkStage2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>168, 87</value>
+    <value>182, 98</value>
+  </data>
+  <data name="chkStage2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 25</value>
+  </data>
+  <data name="chkStage1.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkStage1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>168, 62</value>
+    <value>182, 67</value>
+  </data>
+  <data name="chkStage1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 25</value>
+  </data>
+  <data name="chkEGR.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkEGR.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 137</value>
+    <value>6, 160</value>
+  </data>
+  <data name="chkEGR.Size" type="System.Drawing.Size, System.Drawing">
+    <value>58, 25</value>
+  </data>
+  <data name="chkDPF.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkDPF.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 112</value>
+    <value>6, 129</value>
+  </data>
+  <data name="chkDPF.Size" type="System.Drawing.Size, System.Drawing">
+    <value>57, 25</value>
+  </data>
+  <data name="chkAnahtarKopyalama.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkAnahtarKopyalama.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 87</value>
+    <value>6, 98</value>
+  </data>
+  <data name="chkAnahtarKopyalama.Size" type="System.Drawing.Size, System.Drawing">
+    <value>165, 25</value>
+  </data>
+  <data name="chkAdBlue.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="chkAdBlue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 62</value>
+    <value>6, 67</value>
+  </data>
+  <data name="chkAdBlue.Size" type="System.Drawing.Size, System.Drawing">
+    <value>78, 25</value>
+  </data>
+  <data name="txtAra.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 12pt</value>
   </data>
   <data name="txtAra.Location" type="System.Drawing.Point, System.Drawing">
-    <value>377, 224</value>
+    <value>377, 257</value>
   </data>
   <data name="txtAra.Size" type="System.Drawing.Size, System.Drawing">
-    <value>312, 23</value>
+    <value>312, 29</value>
   </data>
   <data name="txtAra.Text" xml:space="preserve">
     <value>Kayıt Aramak İçin Plaka Giriniz...</value>
   </data>
+  <data name="btnKaydet.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
+  </data>
   <data name="btnKaydet.Location" type="System.Drawing.Point, System.Drawing">
-    <value>21, 176</value>
+    <value>6, 202</value>
+  </data>
+  <data name="btnKaydet.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 30</value>
+  </data>
+  <data name="btnSil.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
   </data>
   <data name="btnSil.Location" type="System.Drawing.Point, System.Drawing">
-    <value>102, 176</value>
+    <value>94, 202</value>
+  </data>
+  <data name="btnSil.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 30</value>
+  </data>
+  <data name="btnGuncelle.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
   </data>
   <data name="btnGuncelle.Location" type="System.Drawing.Point, System.Drawing">
-    <value>183, 176</value>
+    <value>182, 202</value>
+  </data>
+  <data name="btnGuncelle.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 30</value>
+  </data>
+  <data name="btnTemizle.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
   </data>
   <data name="btnTemizle.Location" type="System.Drawing.Point, System.Drawing">
-    <value>264, 176</value>
+    <value>270, 202</value>
+  </data>
+  <data name="btnTemizle.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 30</value>
   </data>
   <data name="dgvMusteriler.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 261</value>
+    <value>12, 297</value>
   </data>
   <data name="dgvMusteriler.Size" type="System.Drawing.Size, System.Drawing">
-    <value>677, 375</value>
+    <value>677, 367</value>
   </data>
   <data name="pictureBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>377, 135</value>
+    <value>377, 160</value>
   </data>
   <data name="pictureBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>312, 83</value>
+    <value>312, 91</value>
   </data>
   <data name="pictureBox2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -626,17 +713,23 @@
         FeRNkpz/dEfimb0cjZAjpJil7xP/Dxx/Bv8Go8KsAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="pictureBox2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>293, 22</value>
+  </data>
   <data name="pictureBox2.Size" type="System.Drawing.Size, System.Drawing">
     <value>60, 60</value>
   </data>
   <data name="pictureBox2.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
     <value>StretchImage</value>
   </data>
+  <data name="groupBox2.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9.75pt</value>
+  </data>
   <data name="groupBox2.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 48</value>
   </data>
   <data name="groupBox2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>359, 205</value>
+    <value>359, 238</value>
   </data>
   <data name="groupBox2.Text" xml:space="preserve">
     <value>Müşteri / İşlem Kayıt</value>
@@ -1072,6 +1165,6 @@
     <value>Miraç Oto Anahtar / Elektrik</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>701, 648</value>
+    <value>701, 676</value>
   </data>
 </root>
