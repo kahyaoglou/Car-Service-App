@@ -19,8 +19,7 @@ namespace Car_Service_App
                 conn.Open();
                 string queryMusteriler = @"CREATE TABLE IF NOT EXISTS Musteriler (
                                             ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            Plaka TEXT NOT NULL,
-                                            Isim TEXT NOT NULL
+                                            Plaka TEXT NOT NULL
                                           );";
 
                 string queryIslemler = @"CREATE TABLE IF NOT EXISTS Islemler (
@@ -31,10 +30,8 @@ namespace Car_Service_App
                                             FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
                                           );";
 
-                SQLiteCommand cmd1 = new SQLiteCommand(queryMusteriler, conn);
-                SQLiteCommand cmd2 = new SQLiteCommand(queryIslemler, conn);
-                cmd1.ExecuteNonQuery();
-                cmd2.ExecuteNonQuery();
+                new SQLiteCommand(queryMusteriler, conn).ExecuteNonQuery();
+                new SQLiteCommand(queryIslemler, conn).ExecuteNonQuery();
             }
         }
 
@@ -43,36 +40,34 @@ namespace Car_Service_App
             CreateDatabase();
             InitializeComponent();
             VerileriGetir();
+            YazdirTxt();
         }
 
         private void btnKaydet_Click(object sender, EventArgs e)
         {
             string plaka = txtPlaka.Text.Trim();
-            string isim = txtIsim.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(plaka) || string.IsNullOrWhiteSpace(isim))
+            if (string.IsNullOrWhiteSpace(plaka))
             {
-                MessageBox.Show("Lütfen plaka ve isim alanlarýný doldurun.", "Uyarý", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Lütfen plaka alanýný doldurun.", "Uyarý", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                string insertMusteri = "INSERT INTO Musteriler (Plaka, Isim) VALUES (@Plaka, @Isim);";
+                string insertMusteri = "INSERT INTO Musteriler (Plaka) VALUES (@Plaka);";
                 SQLiteCommand cmd = new SQLiteCommand(insertMusteri, conn);
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
-                cmd.Parameters.AddWithValue("@Isim", isim);
                 cmd.ExecuteNonQuery();
 
-                long musteriID = conn.LastInsertRowId; // Eklenen müþterinin ID'sini al
+                long musteriID = conn.LastInsertRowId;
 
-                // Ýþlemleri kaydet
                 KaydetIslemler(conn, musteriID);
 
                 MessageBox.Show("Müþteri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
-                YazdirTxt();  // Update the text file after data update
+                YazdirTxt();
             }
         }
 
@@ -108,11 +103,14 @@ namespace Car_Service_App
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
-                string query = @"SELECT m.ID, m.Plaka, m.Isim, 
-                                GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
-                         FROM Musteriler m
-                         LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                         GROUP BY m.ID, m.Plaka, m.Isim;";
+                string query = @"
+                    SELECT 
+                        m.ID, 
+                        m.Plaka, 
+                        GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
+                    FROM Musteriler m
+                    LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                    GROUP BY m.ID, m.Plaka;";
 
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, conn);
                 DataTable dt = new DataTable();
@@ -123,29 +121,17 @@ namespace Car_Service_App
 
         private void YazdirTxt()
         {
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            using (StreamWriter writer = new StreamWriter(filePath, false))
             {
-                conn.Open();
-                string query = @"SELECT m.Plaka, m.Isim, 
-                                GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
-                         FROM Musteriler m
-                         LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                         GROUP BY m.ID, m.Plaka, m.Isim;";
-
-                SQLiteCommand cmd = new SQLiteCommand(query, conn);
-                SQLiteDataReader reader = cmd.ExecuteReader();
-
-                List<string> lines = new List<string>();
-                while (reader.Read())
+                foreach (DataGridViewRow row in dgvMusteriler.Rows)
                 {
-                    string plaka = reader["Plaka"].ToString();
-                    string isim = reader["Isim"].ToString();
-                    string islemler = reader["Islemler"].ToString();
-                    lines.Add($"{plaka} - {isim}: {islemler}");
+                    if (!row.IsNewRow)
+                    {
+                        writer.WriteLine("Plaka: " + row.Cells["Plaka"].Value);
+                        writer.WriteLine("Ýþlemler: " + row.Cells["Islemler"].Value);
+                        writer.WriteLine("--------------");
+                    }
                 }
-
-                // Write to the file
-                File.WriteAllLines(filePath, lines);
             }
         }
 
@@ -184,7 +170,6 @@ namespace Car_Service_App
             {
                 int musteriID = Convert.ToInt32(dgvMusteriler.SelectedRows[0].Cells["ID"].Value);
                 txtPlaka.Text = dgvMusteriler.SelectedRows[0].Cells["Plaka"].Value.ToString();
-                txtIsim.Text = dgvMusteriler.SelectedRows[0].Cells["Isim"].Value.ToString();
 
                 // CheckBox'larý sýfýrla
                 foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
@@ -230,22 +215,21 @@ namespace Car_Service_App
 
             int musteriID = Convert.ToInt32(dgvMusteriler.SelectedRows[0].Cells["ID"].Value);
             string plaka = txtPlaka.Text.Trim();
-            string isim = txtIsim.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(plaka) || string.IsNullOrWhiteSpace(isim))
+            if (string.IsNullOrWhiteSpace(plaka))
             {
-                MessageBox.Show("Lütfen plaka ve isim alanlarýný doldurun.", "Uyarý", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Lütfen plaka alanýný doldurun.", "Uyarý", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 conn.Open();
+
                 // Müþteri bilgilerini güncelle
-                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka, Isim = @Isim WHERE ID = @ID;";
+                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka WHERE ID = @ID;";
                 SQLiteCommand cmd = new SQLiteCommand(updateMusteri, conn);
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
-                cmd.Parameters.AddWithValue("@Isim", isim);
                 cmd.Parameters.AddWithValue("@ID", musteriID);
                 cmd.ExecuteNonQuery();
 
@@ -260,7 +244,7 @@ namespace Car_Service_App
 
                 MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
-                YazdirTxt();  // Update the text file after update
+                YazdirTxt();
             }
 
             Temizle();
@@ -269,7 +253,6 @@ namespace Car_Service_App
         private void Temizle()
         {
             txtPlaka.Text = "";
-            txtIsim.Text = "";
 
             foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
             {
@@ -288,12 +271,11 @@ namespace Car_Service_App
             SELECT 
                 m.ID, 
                 m.Plaka, 
-                m.Isim, 
                 GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
             FROM Musteriler m
             LEFT JOIN Islemler i ON m.ID = i.MusteriID
-            WHERE m.Plaka LIKE @Arama OR m.Isim LIKE @Arama
-            GROUP BY m.ID, m.Plaka, m.Isim;";
+            WHERE m.Plaka LIKE @Arama
+            GROUP BY m.ID, m.Plaka;";
 
                 if (string.IsNullOrEmpty(aramaTerimi))
                 {
@@ -301,11 +283,10 @@ namespace Car_Service_App
                 SELECT 
                     m.ID, 
                     m.Plaka, 
-                    m.Isim, 
                     GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
                 FROM Musteriler m
                 LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                GROUP BY m.ID, m.Plaka, m.Isim;";
+                GROUP BY m.ID, m.Plaka;";
                 }
 
                 SQLiteCommand cmd = new SQLiteCommand(query, conn);
@@ -321,6 +302,11 @@ namespace Car_Service_App
         private void txtAra_TextChanged(object sender, EventArgs e)
         {
             btnAra_Click(sender, e); // Ayný arama metodunu çaðýrýyoruz
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
