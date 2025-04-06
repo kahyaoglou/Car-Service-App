@@ -12,37 +12,10 @@ namespace Car_Service_App
     {
         string connectionString = "Data Source=CarServiceApp.db;Version=3;";
 
-        private void CreateDatabase()
-        {
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-
-                string queryMusteriler = @"CREATE TABLE IF NOT EXISTS Musteriler (
-                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    Plaka TEXT NOT NULL,
-                                    CreateDate TEXT NOT NULL,
-                                    UpdateDate TEXT NOT NULL
-                                  );";
-
-                string queryIslemler = @"CREATE TABLE IF NOT EXISTS Islemler (
-                                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    MusteriID INTEGER,
-                                    IslemAdi TEXT NOT NULL,
-                                    Durum TEXT NOT NULL,
-                                    CreateDate TEXT NOT NULL,
-                                    UpdateDate TEXT NOT NULL,
-                                    FOREIGN KEY(MusteriID) REFERENCES Musteriler(ID)
-                                  );";
-
-                new SQLiteCommand(queryMusteriler, conn).ExecuteNonQuery();
-                new SQLiteCommand(queryIslemler, conn).ExecuteNonQuery();
-            }
-        }
-
         public MainPage()
         {
-            CreateDatabase();
+            var dbManager = new DatabaseManager(connectionString);
+            dbManager.CreateDatabase();
             InitializeComponent();
             VerileriGetir();
             YazdirTxt();
