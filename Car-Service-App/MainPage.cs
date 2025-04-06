@@ -71,38 +71,6 @@ namespace Car_Service_App
             YazdirTxt();
         }
 
-        public void KaydetIslemler(SQLiteConnection conn, long musteriID)
-        {
-            List<(CheckBox, string)> islemler = new List<(CheckBox, string)>
-            {
-                (chkAdBlue, "AdBlue"),
-                (chkDPF, "DPF"),
-                (chkEGR, "EGR"),
-                (chkStage1, "Stage 1"),
-                (chkStage2, "Stage 2"),
-                (chkOnOff, "On/Off"),
-                (chkDtcOff, "DTC Off"),
-                (chkAnahtarKopyalama, "Anahtar Kopyalama")
-            };
-
-            string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
-
-            foreach (var (checkBox, islemAdi) in islemler)
-            {
-                if (checkBox.Checked)
-                {
-                    string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum, CreateDate, UpdateDate) VALUES (@MusteriID, @IslemAdi, 'Yapýldý', @CreateDate, @UpdateDate);";
-                    SQLiteCommand cmd = new SQLiteCommand(insertIslem, conn);
-                    cmd.Parameters.AddWithValue("@MusteriID", musteriID);
-                    cmd.Parameters.AddWithValue("@IslemAdi", islemAdi);
-                    cmd.Parameters.AddWithValue("@CreateDate", currentDate);
-                    cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
         private void VerileriGetir()
         {
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
@@ -243,7 +211,6 @@ namespace Car_Service_App
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
                 cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
                 cmd.Parameters.AddWithValue("@ID", musteriID);
-                cmd.Parameters.AddWithValue("@UpdateDate", DateTime.Now);
                 cmd.ExecuteNonQuery();
 
                 // Eski iþlemleri sil
@@ -252,8 +219,33 @@ namespace Car_Service_App
                 cmdDelete.Parameters.AddWithValue("@MusteriID", musteriID);
                 cmdDelete.ExecuteNonQuery();
 
-                // Yeni iþlemleri ekle
-                KaydetIslemler(conn, musteriID);
+                // Yeni iþlemleri ekle - Bu kýsmý burada direkt yazýyoruz
+                List<(CheckBox, string)> islemler = new List<(CheckBox, string)>
+        {
+            (chkAdBlue, "AdBlue"),
+            (chkDPF, "DPF"),
+            (chkEGR, "EGR"),
+            (chkStage1, "Stage 1"),
+            (chkStage2, "Stage 2"),
+            (chkOnOff, "On/Off"),
+            (chkDtcOff, "DTC Off"),
+            (chkAnahtarKopyalama, "Anahtar Kopyalama")
+        };
+
+                foreach (var (checkBox, islemAdi) in islemler)
+                {
+                    if (checkBox.Checked)
+                    {
+                        string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum, CreateDate, UpdateDate) VALUES (@MusteriID, @IslemAdi, 'Yapýldý', @CreateDate, @UpdateDate);";
+                        SQLiteCommand cmdInsert = new SQLiteCommand(insertIslem, conn);
+                        cmdInsert.Parameters.AddWithValue("@MusteriID", musteriID);
+                        cmdInsert.Parameters.AddWithValue("@IslemAdi", islemAdi);
+                        cmdInsert.Parameters.AddWithValue("@CreateDate", currentDate);
+                        cmdInsert.Parameters.AddWithValue("@UpdateDate", currentDate);
+
+                        cmdInsert.ExecuteNonQuery();
+                    }
+                }
 
                 MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
