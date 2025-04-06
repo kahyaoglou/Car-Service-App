@@ -61,6 +61,46 @@ namespace Car_Service_App.Managers
             }
         }
 
+        public void MusteriGuncelle(int musteriID, string plaka, List<(CheckBox, string)> islemler)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_connectionString))
+            {
+                conn.Open();
+
+                string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+
+                // Müşteri bilgilerini güncelle
+                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka, UpdateDate = @UpdateDate WHERE ID = @ID;";
+                SQLiteCommand cmd = new SQLiteCommand(updateMusteri, conn);
+                cmd.Parameters.AddWithValue("@Plaka", plaka);
+                cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
+                cmd.Parameters.AddWithValue("@ID", musteriID);
+                cmd.ExecuteNonQuery();
+
+                // Eski işlemleri sil
+                string deleteIslemler = "DELETE FROM Islemler WHERE MusteriID = @MusteriID;";
+                SQLiteCommand cmdDelete = new SQLiteCommand(deleteIslemler, conn);
+                cmdDelete.Parameters.AddWithValue("@MusteriID", musteriID);
+                cmdDelete.ExecuteNonQuery();
+
+                // Yeni işlemleri ekle
+                foreach (var (checkBox, islemAdi) in islemler)
+                {
+                    if (checkBox.Checked)
+                    {
+                        string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum, CreateDate, UpdateDate) VALUES (@MusteriID, @IslemAdi, 'Yapıldı', @CreateDate, @UpdateDate);";
+                        SQLiteCommand cmdInsert = new SQLiteCommand(insertIslem, conn);
+                        cmdInsert.Parameters.AddWithValue("@MusteriID", musteriID);
+                        cmdInsert.Parameters.AddWithValue("@IslemAdi", islemAdi);
+                        cmdInsert.Parameters.AddWithValue("@CreateDate", currentDate);
+                        cmdInsert.Parameters.AddWithValue("@UpdateDate", currentDate);
+
+                        cmdInsert.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
         public void MusteriSil(int musteriID)
         {
             using (SQLiteConnection conn = new SQLiteConnection(_connectionString))

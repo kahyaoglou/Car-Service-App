@@ -199,60 +199,27 @@ namespace Car_Service_App
                 return;
             }
 
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            var musteriManager = new MusteriManager(connectionString);
+            var islemler = new List<(CheckBox, string)>
             {
-                conn.Open();
+                (chkAdBlue, "AdBlue"),
+                (chkDPF, "DPF"),
+                (chkEGR, "EGR"),
+                (chkStage1, "Stage 1"),
+                (chkStage2, "Stage 2"),
+                (chkOnOff, "On/Off"),
+                (chkDtcOff, "DTC Off"),
+                (chkAnahtarKopyalama, "Anahtar Kopyalama")
+            };
 
-                string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+            musteriManager.MusteriGuncelle(musteriID, plaka, islemler);
 
-                // Müþteri bilgilerini güncelle
-                string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka, UpdateDate = @UpdateDate WHERE ID = @ID;";
-                SQLiteCommand cmd = new SQLiteCommand(updateMusteri, conn);
-                cmd.Parameters.AddWithValue("@Plaka", plaka);
-                cmd.Parameters.AddWithValue("@UpdateDate", currentDate);
-                cmd.Parameters.AddWithValue("@ID", musteriID);
-                cmd.ExecuteNonQuery();
-
-                // Eski iþlemleri sil
-                string deleteIslemler = "DELETE FROM Islemler WHERE MusteriID = @MusteriID;";
-                SQLiteCommand cmdDelete = new SQLiteCommand(deleteIslemler, conn);
-                cmdDelete.Parameters.AddWithValue("@MusteriID", musteriID);
-                cmdDelete.ExecuteNonQuery();
-
-                // Yeni iþlemleri ekle - Bu kýsmý burada direkt yazýyoruz
-                List<(CheckBox, string)> islemler = new List<(CheckBox, string)>
-        {
-            (chkAdBlue, "AdBlue"),
-            (chkDPF, "DPF"),
-            (chkEGR, "EGR"),
-            (chkStage1, "Stage 1"),
-            (chkStage2, "Stage 2"),
-            (chkOnOff, "On/Off"),
-            (chkDtcOff, "DTC Off"),
-            (chkAnahtarKopyalama, "Anahtar Kopyalama")
-        };
-
-                foreach (var (checkBox, islemAdi) in islemler)
-                {
-                    if (checkBox.Checked)
-                    {
-                        string insertIslem = "INSERT INTO Islemler (MusteriID, IslemAdi, Durum, CreateDate, UpdateDate) VALUES (@MusteriID, @IslemAdi, 'Yapýldý', @CreateDate, @UpdateDate);";
-                        SQLiteCommand cmdInsert = new SQLiteCommand(insertIslem, conn);
-                        cmdInsert.Parameters.AddWithValue("@MusteriID", musteriID);
-                        cmdInsert.Parameters.AddWithValue("@IslemAdi", islemAdi);
-                        cmdInsert.Parameters.AddWithValue("@CreateDate", currentDate);
-                        cmdInsert.Parameters.AddWithValue("@UpdateDate", currentDate);
-
-                        cmdInsert.ExecuteNonQuery();
-                    }
-                }
-
-                MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                VerileriGetir();
-                YazdirTxt();
-            }
+            MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            VerileriGetir();
+            YazdirTxt();
 
             Temizle();
+
         }
 
         private void Temizle()
