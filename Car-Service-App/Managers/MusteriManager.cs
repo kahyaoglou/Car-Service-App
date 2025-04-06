@@ -61,5 +61,26 @@ namespace Car_Service_App.Managers
             }
         }
 
+        public void MusteriSil(int musteriID)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_connectionString))
+            {
+                conn.Open();
+
+                string deleteIslemler = "DELETE FROM Islemler WHERE MusteriID = @MusteriID;";
+                using (SQLiteCommand cmd1 = new SQLiteCommand(deleteIslemler, conn))
+                {
+                    cmd1.Parameters.AddWithValue("@MusteriID", musteriID);
+                    cmd1.ExecuteNonQuery();
+                }
+
+                string deleteMusteri = "DELETE FROM Musteriler WHERE ID = @ID;";
+                using (SQLiteCommand cmd2 = new SQLiteCommand(deleteMusteri, conn))
+                {
+                    cmd2.Parameters.AddWithValue("@ID", musteriID);
+                    cmd2.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

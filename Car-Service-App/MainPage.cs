@@ -40,7 +40,6 @@ namespace Car_Service_App
             }
         }
 
-
         public MainPage()
         {
             CreateDatabase();
@@ -71,7 +70,6 @@ namespace Car_Service_App
             VerileriGetir();
             YazdirTxt();
         }
-
 
         public void KaydetIslemler(SQLiteConnection conn, long musteriID)
         {
@@ -132,7 +130,6 @@ namespace Car_Service_App
             }
         }
 
-
         private void YazdirTxt()
         {
             string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
@@ -158,7 +155,6 @@ namespace Car_Service_App
             }
         }
 
-
         private void btnSil_Click(object sender, EventArgs e)
         {
             if (dgvMusteriler.SelectedRows.Count == 0)
@@ -168,24 +164,13 @@ namespace Car_Service_App
             }
 
             int musteriID = Convert.ToInt32(dgvMusteriler.SelectedRows[0].Cells["ID"].Value);
+            var musteriManager = new MusteriManager(connectionString);
 
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-                string deleteIslemler = "DELETE FROM Islemler WHERE MusteriID = @MusteriID;";
-                SQLiteCommand cmd1 = new SQLiteCommand(deleteIslemler, conn);
-                cmd1.Parameters.AddWithValue("@MusteriID", musteriID);
-                cmd1.ExecuteNonQuery();
+            musteriManager.MusteriSil(musteriID);
 
-                string deleteMusteri = "DELETE FROM Musteriler WHERE ID = @ID;";
-                SQLiteCommand cmd2 = new SQLiteCommand(deleteMusteri, conn);
-                cmd2.Parameters.AddWithValue("@ID", musteriID);
-                cmd2.ExecuteNonQuery();
-
-                MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                VerileriGetir();
-                YazdirTxt();
-            }
+            MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            VerileriGetir();
+            YazdirTxt();
         }
 
         private void dgvMusteriler_SelectionChanged(object sender, EventArgs e)
