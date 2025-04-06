@@ -1,3 +1,4 @@
+using Car_Service_App.Managers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -50,37 +51,29 @@ namespace Car_Service_App
 
         private void btnKaydet_Click(object sender, EventArgs e)
         {
-            string plaka = txtPlaka.Text.Trim().ToUpper();
+            var musteriManager = new MusteriManager(connectionString);
+            string plaka = txtPlaka.Text;
 
-            if (string.IsNullOrWhiteSpace(plaka))
+            var islemler = new List<(CheckBox, string)>
             {
-                MessageBox.Show("Lütfen plaka alanýný doldurun.", "Uyarý", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+                (chkAdBlue, "AdBlue"),
+                (chkDPF, "DPF"),
+                (chkEGR, "EGR"),
+                (chkStage1, "Stage 1"),
+                (chkStage2, "Stage 2"),
+                (chkOnOff, "On/Off"),
+                (chkDtcOff, "DTC Off"),
+                (chkAnahtarKopyalama, "Anahtar Kopyalama")
+            };
 
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
+            musteriManager.MusteriKaydet(plaka, islemler);
 
-                // Güncellenmiþ insert sorgusu
-                string insertMusteri = "INSERT INTO Musteriler (Plaka, CreateDate, UpdateDate) VALUES (@Plaka, @CreateDate, @UpdateDate);";
-                SQLiteCommand cmd = new SQLiteCommand(insertMusteri, conn);
-                cmd.Parameters.AddWithValue("@Plaka", plaka);
-                cmd.Parameters.AddWithValue("@CreateDate", DateTime.Now);
-                cmd.Parameters.AddWithValue("@UpdateDate", DateTime.Now);
-                cmd.ExecuteNonQuery();
-
-                long musteriID = conn.LastInsertRowId;
-
-                KaydetIslemler(conn, musteriID);
-
-                MessageBox.Show("Müþteri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                VerileriGetir();
-                YazdirTxt();
-            }
+            VerileriGetir();
+            YazdirTxt();
         }
 
-        private void KaydetIslemler(SQLiteConnection conn, long musteriID)
+
+        public void KaydetIslemler(SQLiteConnection conn, long musteriID)
         {
             List<(CheckBox, string)> islemler = new List<(CheckBox, string)>
             {
@@ -133,10 +126,7 @@ namespace Car_Service_App
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
                 dgvMusteriler.DataSource = dt;
-
                 dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-                // You can adjust the format of the date columns if needed
                 dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
                 dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
             }
@@ -194,7 +184,7 @@ namespace Car_Service_App
 
                 MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 VerileriGetir();
-                YazdirTxt();  // Update the text file after deletion
+                YazdirTxt();
             }
         }
 
