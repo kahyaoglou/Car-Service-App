@@ -1,3 +1,4 @@
+using Car_Service_App.Helpers;
 using Car_Service_App.Managers;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Car_Service_App
             var musteriManager = new MusteriManager(connectionString);
             musteriManager.MusteriGetir(dgvMusteriler);
 
-            YazdirTxt();
+            BackupHelper.YazdirTxt(dgvMusteriler);
         }
 
         private void btnKaydet_Click(object sender, EventArgs e)
@@ -44,32 +45,7 @@ namespace Car_Service_App
 
             musteriManager.MusteriKaydet(plaka, islemler);
             musteriManager.MusteriGetir(dgvMusteriler);
-            YazdirTxt();
-        }
-
-        private void YazdirTxt()
-        {
-            string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
-
-            if (!Directory.Exists(carServiceAppFolderPath))
-            {
-                Directory.CreateDirectory(carServiceAppFolderPath);
-            }
-
-            string filePath = Path.Combine(carServiceAppFolderPath, "IslemKaydi.txt");
-
-            using (StreamWriter writer = new StreamWriter(filePath, false))
-            {
-                foreach (DataGridViewRow row in dgvMusteriler.Rows)
-                {
-                    if (!row.IsNewRow)
-                    {
-                        writer.WriteLine("Plaka: " + row.Cells["Plaka"].Value);
-                        writer.WriteLine("Ýþlemler: " + row.Cells["Islemler"].Value);
-                        writer.WriteLine("--------------");
-                    }
-                }
-            }
+            BackupHelper.YazdirTxt(dgvMusteriler);
         }
 
         private void btnSil_Click(object sender, EventArgs e)
@@ -87,7 +63,7 @@ namespace Car_Service_App
 
             MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             musteriManager.MusteriGetir(dgvMusteriler);
-            YazdirTxt();
+            BackupHelper.YazdirTxt(dgvMusteriler);
         }
 
         private void dgvMusteriler_SelectionChanged(object sender, EventArgs e)
@@ -163,7 +139,7 @@ namespace Car_Service_App
 
             MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             musteriManager.MusteriGetir(dgvMusteriler);
-            YazdirTxt();
+            BackupHelper.YazdirTxt(dgvMusteriler);
 
             Temizle();
 
