@@ -17,21 +17,25 @@ namespace Car_Service_App.Helpers
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
-
-                    string targetFolderPath = Path.Combine(carServiceAppFolderPath, folderName);
-                    if (!Directory.Exists(targetFolderPath))
-                    {
-                        Directory.CreateDirectory(targetFolderPath);
-                    }
-
+                    string targetFolderPath = GetFolderPath(folderName);
                     string targetFilePath = Path.Combine(targetFolderPath, Path.GetFileName(saveFileDialog.FileName));
 
                     File.Copy(saveFileDialog.FileName, targetFilePath, true);
-
                     MessageBox.Show(successMessage, "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
+
+        private static string GetFolderPath(string folderName)
+        {
+            string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
+            string targetFolderPath = Path.Combine(carServiceAppFolderPath, folderName);
+            if (!Directory.Exists(targetFolderPath))
+            {
+                Directory.CreateDirectory(targetFolderPath);
+            }
+            return targetFolderPath;
+        }
+
     }
 }
