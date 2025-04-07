@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Security.Cryptography;
@@ -15,6 +16,34 @@ namespace Car_Service_App.Managers
         public MusteriManager(string connectionString)
         {
             _connectionString = connectionString;
+        }
+
+        public void MusteriGetir(DataGridView dgv)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_connectionString))
+            {
+                conn.Open();
+                string query = @"
+                    SELECT 
+                        m.ID, 
+                        m.Plaka, 
+                        m.CreateDate AS 'Kayıt Tarihi',
+                        m.UpdateDate AS 'Son Güncelleme Tarihi',
+                        GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
+                    FROM Musteriler m
+                    LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                    GROUP BY m.ID, m.Plaka
+                    ORDER BY m.ID DESC;";
+
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+
+                dgv.DataSource = dt;
+                dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+                dgv.Columns["Kayıt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+                dgv.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+            }
         }
 
         public void MusteriKaydet(string plaka, List<(CheckBox, string)> islemler)

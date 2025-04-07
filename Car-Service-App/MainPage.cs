@@ -14,10 +14,14 @@ namespace Car_Service_App
 
         public MainPage()
         {
+            InitializeComponent();
+
             var dbManager = new DatabaseManager(connectionString);
             dbManager.CreateDatabase();
-            InitializeComponent();
-            VerileriGetir();
+
+            var musteriManager = new MusteriManager(connectionString);
+            musteriManager.MusteriGetir(dgvMusteriler);
+
             YazdirTxt();
         }
 
@@ -39,36 +43,8 @@ namespace Car_Service_App
             };
 
             musteriManager.MusteriKaydet(plaka, islemler);
-
-            VerileriGetir();
+            musteriManager.MusteriGetir(dgvMusteriler);
             YazdirTxt();
-        }
-
-        private void VerileriGetir()
-        {
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-                string query = @"
-                SELECT 
-                    m.ID, 
-                    m.Plaka, 
-                    m.CreateDate AS 'Kayýt Tarihi',  -- Add CreateDate here
-                    m.UpdateDate AS 'Son Güncelleme Tarihi',  -- Add UpdateDate here
-                    GROUP_CONCAT(i.IslemAdi || ' (' || i.Durum || ')', ', ') AS Islemler
-                FROM Musteriler m
-                LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                GROUP BY m.ID, m.Plaka
-                ORDER BY m.ID DESC;";
-
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                adapter.Fill(dt);
-                dgvMusteriler.DataSource = dt;
-                dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-                dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
-                dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
-            }
         }
 
         private void YazdirTxt()
@@ -110,7 +86,7 @@ namespace Car_Service_App
             musteriManager.MusteriSil(musteriID);
 
             MessageBox.Show("Müþteri baþarýyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            VerileriGetir();
+            musteriManager.MusteriGetir(dgvMusteriler);
             YazdirTxt();
         }
 
@@ -121,13 +97,11 @@ namespace Car_Service_App
                 int musteriID = Convert.ToInt32(dgvMusteriler.SelectedRows[0].Cells["ID"].Value);
                 txtPlaka.Text = dgvMusteriler.SelectedRows[0].Cells["Plaka"].Value.ToString();
 
-                // CheckBox'larý sýfýrla
                 foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
                 {
                     checkbox.Checked = false;
                 }
 
-                // Ýþlemleri veritabanýndan çek ve ilgili checkbox'larý iþaretle
                 using (SQLiteConnection conn = new SQLiteConnection(connectionString))
                 {
                     conn.Open();
@@ -188,7 +162,7 @@ namespace Car_Service_App
             musteriManager.MusteriGuncelle(musteriID, plaka, islemler);
 
             MessageBox.Show("Müþteri baþarýyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            VerileriGetir();
+            musteriManager.MusteriGetir(dgvMusteriler);
             YazdirTxt();
 
             Temizle();
@@ -249,7 +223,6 @@ namespace Car_Service_App
                 dgvMusteriler.DataSource = dt;
                 dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
-                // Format date columns
                 dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
                 dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
             }
@@ -264,26 +237,21 @@ namespace Car_Service_App
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                // Kullanýcýya herhangi bir dosya türü seçmesi için seçenek sunalým
                 saveFileDialog.Filter = "All files (*.*)|*.*";
                 saveFileDialog.Title = "Orijinal Veri Kaydet";
 
-                // Dosya seçildiðinde
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
 
-                    // Klasör yoksa oluþtur
                     string originalFolderPath = Path.Combine(carServiceAppFolderPath, "Orijinal Veriler");
                     if (!Directory.Exists(originalFolderPath))
                     {
                         Directory.CreateDirectory(originalFolderPath);
                     }
 
-                    // Seçilen dosyanýn hedef yolu
                     string targetFilePath = Path.Combine(originalFolderPath, Path.GetFileName(saveFileDialog.FileName));
 
-                    // Seçilen dosyayý hedef klasöre kopyala
                     File.Copy(saveFileDialog.FileName, targetFilePath, true);
 
                     MessageBox.Show("Orijinal veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -298,22 +266,18 @@ namespace Car_Service_App
                 saveFileDialog.Filter = "All files (*.*)|*.*";
                 saveFileDialog.Title = "Tuningli Veri Kaydet";
 
-                // Dosya seçildiðinde
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
 
-                    // Klasör yoksa oluþtur
                     string tuningFolderPath = Path.Combine(carServiceAppFolderPath, "Tuningli Veriler");
                     if (!Directory.Exists(tuningFolderPath))
                     {
                         Directory.CreateDirectory(tuningFolderPath);
                     }
 
-                    // Seçilen dosyanýn hedef yolu
                     string targetFilePath = Path.Combine(tuningFolderPath, Path.GetFileName(saveFileDialog.FileName));
 
-                    // Seçilen dosyayý hedef klasöre kopyala
                     File.Copy(saveFileDialog.FileName, targetFilePath, true);
 
                     MessageBox.Show("Tuningli veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
