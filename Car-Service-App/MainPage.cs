@@ -169,54 +169,12 @@ namespace Car_Service_App
 
         private void btnOrijinalVeriKaydet_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "All files (*.*)|*.*";
-                saveFileDialog.Title = "Orijinal Veri Kaydet";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
-
-                    string originalFolderPath = Path.Combine(carServiceAppFolderPath, "Orijinal Veriler");
-                    if (!Directory.Exists(originalFolderPath))
-                    {
-                        Directory.CreateDirectory(originalFolderPath);
-                    }
-
-                    string targetFilePath = Path.Combine(originalFolderPath, Path.GetFileName(saveFileDialog.FileName));
-
-                    File.Copy(saveFileDialog.FileName, targetFilePath, true);
-
-                    MessageBox.Show("Orijinal veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
+            FileHelper.SaveDataToFolder("Orijinal Veriler", "Orijinal Veri Kaydet", "Orijinal veri baþarýyla kaydedildi.");
         }
 
         private void btnTuningliVeriKaydet_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "All files (*.*)|*.*";
-                saveFileDialog.Title = "Tuningli Veri Kaydet";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string carServiceAppFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Car Service App");
-
-                    string tuningFolderPath = Path.Combine(carServiceAppFolderPath, "Tuningli Veriler");
-                    if (!Directory.Exists(tuningFolderPath))
-                    {
-                        Directory.CreateDirectory(tuningFolderPath);
-                    }
-
-                    string targetFilePath = Path.Combine(tuningFolderPath, Path.GetFileName(saveFileDialog.FileName));
-
-                    File.Copy(saveFileDialog.FileName, targetFilePath, true);
-
-                    MessageBox.Show("Tuningli veri baþarýyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
+            FileHelper.SaveDataToFolder("Tuningli Veriler", "Tuningli Veri Kaydet", "Tuningli veri baþarýyla kaydedildi.");
         }
 
         private void txtAra_Click(object sender, EventArgs e)
