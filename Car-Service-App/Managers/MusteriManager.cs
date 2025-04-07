@@ -151,5 +151,43 @@ namespace Car_Service_App.Managers
                 }
             }
         }
+
+        public DataTable MusteriAra(string aramaTerimi)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_connectionString))
+            {
+                conn.Open();
+
+                string query = @"
+                SELECT 
+                    m.ID, 
+                    m.Plaka, 
+                    m.CreateDate AS 'Kayıt Tarihi',  
+                    m.UpdateDate AS 'Son Güncelleme Tarihi',  
+                    GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
+                FROM Musteriler m
+                LEFT JOIN Islemler i ON m.ID = i.MusteriID
+                {0}
+                GROUP BY m.ID, m.Plaka
+                ORDER BY m.ID DESC;";
+
+                string whereClause = "";
+
+                if (!string.IsNullOrEmpty(aramaTerimi))
+                    whereClause = "WHERE m.Plaka LIKE @Arama";
+
+                string finalQuery = string.Format(query, whereClause);
+
+                SQLiteCommand cmd = new SQLiteCommand(finalQuery, conn);
+
+                if (!string.IsNullOrEmpty(aramaTerimi))
+                    cmd.Parameters.AddWithValue("@Arama", "%" + aramaTerimi + "%");
+
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                return dt;
+            }
+        }
     }
 }

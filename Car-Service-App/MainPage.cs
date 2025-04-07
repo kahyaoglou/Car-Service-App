@@ -148,50 +148,18 @@ namespace Car_Service_App
         private void txtAra_TextChanged(object sender, EventArgs e)
         {
             string aramaTerimi = txtAra.Text.Trim();
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
 
-                string query = @"
-                SELECT 
-                    m.ID, 
-                    m.Plaka, 
-                    m.CreateDate AS 'Kayýt Tarihi',  -- Add CreateDate here
-                    m.UpdateDate AS 'Son Güncelleme Tarihi',  -- Add UpdateDate here
-                    GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
-                FROM Musteriler m
-                LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                WHERE m.Plaka LIKE @Arama
-                GROUP BY m.ID, m.Plaka
-                ORDER BY m.ID DESC;";
+            MusteriManager musteriManager = new MusteriManager(connectionString);
+            DataTable dt = musteriManager.MusteriAra(aramaTerimi);
 
-                if (string.IsNullOrEmpty(aramaTerimi))
-                {
-                    query = @"
-                    SELECT 
-                        m.ID, 
-                        m.Plaka, 
-                        m.CreateDate AS 'Kayýt Tarihi', 
-                        m.UpdateDate AS 'Son Güncelleme Tarihi', 
-                        GROUP_CONCAT(i.IslemAdi, ', ') AS YapilanIslemler
-                    FROM Musteriler m
-                    LEFT JOIN Islemler i ON m.ID = i.MusteriID
-                    GROUP BY m.ID, m.Plaka
-                    ORDER BY m.ID DESC;";
-                }
+            dgvMusteriler.DataSource = dt;
+            dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
-                SQLiteCommand cmd = new SQLiteCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Arama", "%" + aramaTerimi + "%");
-
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                adapter.Fill(dt);
-                dgvMusteriler.DataSource = dt;
-                dgvMusteriler.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
+            if (dgvMusteriler.Columns.Contains("Kayýt Tarihi"))
                 dgvMusteriler.Columns["Kayýt Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
+
+            if (dgvMusteriler.Columns.Contains("Son Güncelleme Tarihi"))
                 dgvMusteriler.Columns["Son Güncelleme Tarihi"].DefaultCellStyle.Format = "dd-MM-yyyy HH:mm:ss";
-            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)
