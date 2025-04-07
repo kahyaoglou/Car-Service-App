@@ -141,18 +141,8 @@ namespace Car_Service_App
             musteriManager.MusteriGetir(dgvMusteriler);
             BackupHelper.YazdirTxt(dgvMusteriler);
 
-            Temizle();
+            CleanHelper.Temizle(txtPlaka, chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama);
 
-        }
-
-        private void Temizle()
-        {
-            txtPlaka.Text = "";
-
-            foreach (var checkbox in new CheckBox[] { chkAdBlue, chkDPF, chkEGR, chkStage1, chkStage2, chkOnOff, chkDtcOff, chkAnahtarKopyalama })
-            {
-                checkbox.Checked = false;
-            }
         }
 
         private void txtAra_TextChanged(object sender, EventArgs e)
