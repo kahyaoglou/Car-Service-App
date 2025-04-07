@@ -98,7 +98,6 @@ namespace Car_Service_App.Managers
 
                 string currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
 
-                // Müşteri bilgilerini güncelle
                 string updateMusteri = "UPDATE Musteriler SET Plaka = @Plaka, UpdateDate = @UpdateDate WHERE ID = @ID;";
                 SQLiteCommand cmd = new SQLiteCommand(updateMusteri, conn);
                 cmd.Parameters.AddWithValue("@Plaka", plaka);
@@ -106,13 +105,11 @@ namespace Car_Service_App.Managers
                 cmd.Parameters.AddWithValue("@ID", musteriID);
                 cmd.ExecuteNonQuery();
 
-                // Eski işlemleri sil
                 string deleteIslemler = "DELETE FROM Islemler WHERE MusteriID = @MusteriID;";
                 SQLiteCommand cmdDelete = new SQLiteCommand(deleteIslemler, conn);
                 cmdDelete.Parameters.AddWithValue("@MusteriID", musteriID);
                 cmdDelete.ExecuteNonQuery();
 
-                // Yeni işlemleri ekle
                 foreach (var (checkBox, islemAdi) in islemler)
                 {
                     if (checkBox.Checked)
